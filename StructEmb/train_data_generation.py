@@ -84,5 +84,10 @@ for i, size in enumerate(group_sizes):
     torch.save(batch, f'Dataset/Train_data_batch_{i+1}.pt')
     start += size
 
-info = [torch.load(f'Dataset/Train_data_information/infor{i+1}.pt') for i in range(101)]
-torch.save(info, 'Dataset/Train_data_information.pt')
+merged = {
+    'id': sum([torch.load(f'Dataset/Train_data_information/infor{i+1}.pt')['id'] for i in range(101)], []),
+    'post_id': sum([torch.load(f'Dataset/Train_data_information/infor{i+1}.pt')['post_id'] for i in range(101)], []),
+    'type': sum([torch.load(f'Dataset/Train_data_information/infor{i+1}.pt')['type'] for i in range(101)], []),
+    'visual_id': sum([torch.load(f'Dataset/Train_data_information/infor{i+1}.pt')['visual_id'] for i in range(101)], []),
+}
+torch.save(merged, 'Dataset/Train_data_information.pt')

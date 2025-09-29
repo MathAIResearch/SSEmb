@@ -2,7 +2,7 @@ import os
 import argparse
 
 
-def calculated_ndcg(res_directory, trec_eval_tool, qre_file_path):
+def calculated_ndcg_10(res_directory, trec_eval_tool, qre_file_path):
     result = {}
     for file in os.listdir(res_directory):
         output = os.popen(f"{trec_eval_tool} {qre_file_path} {res_directory + file} -m ndcg_cut.10").read()
@@ -11,6 +11,14 @@ def calculated_ndcg(res_directory, trec_eval_tool, qre_file_path):
         result[submission] = score
     return result
 
+def calculated_ndcg_5(res_directory, trec_eval_tool, qre_file_path):
+    result = {}
+    for file in os.listdir(res_directory):
+        output = os.popen(f"{trec_eval_tool} {qre_file_path} {res_directory + file} -m ndcg_cut.5").read()
+        score = output.split("\t")[2].strip()
+        submission = file.split(".")[0].split("prime_")[1]
+        result[submission] = score
+    return result
 
 def calculated_p_at_10(res_directory, trec_eval_tool, qre_file_path):
     result = {}
@@ -34,12 +42,14 @@ def calculated_p_at_5(res_directory, trec_eval_tool, qre_file_path):
 
 def get_result(trec_eval_tool, qre_file_path, prim_result_dir, evaluation_result_file):
     with open(evaluation_result_file, "w") as file_res:
-        res_ndcg_10 = calculated_ndcg(prim_result_dir, trec_eval_tool, qre_file_path)
+        res_ndcg_5 = calculated_ndcg_5(prim_result_dir, trec_eval_tool, qre_file_path)
+        res_ndcg_10 = calculated_ndcg_10(prim_result_dir, trec_eval_tool, qre_file_path)
         res_p10 = calculated_p_at_10(prim_result_dir, trec_eval_tool, qre_file_path)
         res_p5 = calculated_p_at_5(prim_result_dir, trec_eval_tool, qre_file_path)
-        file_res.write("System\tnDCG'10\tp@5\tp@10\n")
+
+        file_res.write("System\tnDCG'5\tnDCG'10\tp@5\tp@10\n")
         for sub in res_ndcg_10:
-            file_res.write(f"{sub}\t{res_ndcg_10[sub]}\t{res_p5[sub]}\t{res_p10[sub]}\n")
+            file_res.write(f"{sub}\t{res_ndcg_5[sub]}\t{res_ndcg_10[sub]}\t{res_p5[sub]}\t{res_p10[sub]}\n")
 
 
 def main():
